@@ -254,7 +254,6 @@ const SafeDeployment = ({ creationTxHash, onCancel, onRetry, onSuccess, submitte
 
         const receipt = await web3.eth.getTransactionReceipt(safeCreationTxHash)
 
-
         let safeAddress
 
         if (receipt.events) {

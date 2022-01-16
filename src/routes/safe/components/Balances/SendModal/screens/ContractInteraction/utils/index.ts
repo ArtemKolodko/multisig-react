@@ -80,15 +80,17 @@ export const generateFormFieldKey = (type: string, signatureHash: string, index:
   return `methodInput-${signatureHash}_${index}_${keyType}`
 }
 
-const extractMethodArgs = (signatureHash: string, values: Record<string, string>) => ({ type }, index) => {
-  const key = generateFormFieldKey(type, signatureHash, index)
+const extractMethodArgs =
+  (signatureHash: string, values: Record<string, string>) =>
+  ({ type }, index) => {
+    const key = generateFormFieldKey(type, signatureHash, index)
 
-  if (isArrayParameter(type)) {
-    return JSON.parse(values[key])
+    if (isArrayParameter(type)) {
+      return JSON.parse(values[key])
+    }
+
+    return values[key]
   }
-
-  return values[key]
-}
 
 export const createTxObject = (
   method: AbiItemExtended,

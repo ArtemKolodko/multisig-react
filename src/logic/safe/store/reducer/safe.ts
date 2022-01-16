@@ -97,10 +97,10 @@ export default handleActions(
           .get('safes')
           .keySeq()
           .forEach((safeAddress) => {
-            const safeActiveTokens = map.getIn(['safes', safeAddress, 'activeTokens'])
+            const safeActiveTokens: any = map.getIn(['safes', safeAddress, 'activeTokens'])
             const activeTokens = safeActiveTokens.add(tokenAddress)
 
-            map.updateIn(['safes', safeAddress], (prevSafe) => prevSafe.mergeDeep({ activeTokens }))
+            map.updateIn(['safes', safeAddress], (prevSafe: any) => prevSafe.mergeDeep({ activeTokens }))
           })
       })
     },
@@ -138,7 +138,7 @@ export default handleActions(
     [ADD_SAFE_OWNER]: (state: SafeReducerMap, action) => {
       const { ownerAddress, ownerName, safeAddress } = action.payload
 
-      const addressFound = state
+      const addressFound = (state as any)
         .getIn(['safes', safeAddress])
         .owners.find((owner) => sameAddress(owner.address, ownerAddress))
 
@@ -146,7 +146,7 @@ export default handleActions(
         return state
       }
 
-      return state.updateIn(['safes', safeAddress], (prevSafe) =>
+      return state.updateIn(['safes', safeAddress], (prevSafe: any) =>
         prevSafe.merge({
           owners: prevSafe.owners.push(makeOwner({ address: ownerAddress, name: ownerName })),
         }),
@@ -155,7 +155,7 @@ export default handleActions(
     [REMOVE_SAFE_OWNER]: (state: SafeReducerMap, action) => {
       const { ownerAddress, safeAddress } = action.payload
 
-      return state.updateIn(['safes', safeAddress], (prevSafe) =>
+      return state.updateIn(['safes', safeAddress], (prevSafe: any) =>
         prevSafe.merge({
           owners: prevSafe.owners.filter((o) => o.address.toLowerCase() !== ownerAddress.toLowerCase()),
         }),
@@ -164,7 +164,7 @@ export default handleActions(
     [REPLACE_SAFE_OWNER]: (state: SafeReducerMap, action) => {
       const { oldOwnerAddress, ownerAddress, ownerName, safeAddress } = action.payload
 
-      return state.updateIn(['safes', safeAddress], (prevSafe) =>
+      return state.updateIn(['safes', safeAddress], (prevSafe: any) =>
         prevSafe.merge({
           owners: prevSafe.owners
             .filter((o) => o.address.toLowerCase() !== oldOwnerAddress.toLowerCase())
@@ -175,7 +175,7 @@ export default handleActions(
     [EDIT_SAFE_OWNER]: (state: SafeReducerMap, action) => {
       const { ownerAddress, ownerName, safeAddress } = action.payload
 
-      return state.updateIn(['safes', safeAddress], (prevSafe) => {
+      return state.updateIn(['safes', safeAddress], (prevSafe: any) => {
         const ownerToUpdateIndex = prevSafe.owners.findIndex(
           (o) => o.address.toLowerCase() === ownerAddress.toLowerCase(),
         )
@@ -190,7 +190,7 @@ export default handleActions(
       const key = activeTokens ? 'activeTokens' : 'blacklistedTokens'
       const list = activeTokens ?? blacklistedTokens
 
-      return state.updateIn(['safes', safeAddress], (prevSafe) => prevSafe.set(key, list))
+      return state.updateIn(['safes', safeAddress], (prevSafe: any) => prevSafe.set(key, list))
     },
     [UPDATE_ASSETS_LIST]: (state: SafeReducerMap, action) => {
       // Only activeAssets or blackListedAssets is required
@@ -199,7 +199,7 @@ export default handleActions(
       const key = activeAssets ? 'activeAssets' : 'blacklistedAssets'
       const list = activeAssets ?? blacklistedAssets
 
-      return state.updateIn(['safes', safeAddress], (prevSafe) => prevSafe.set(key, list))
+      return state.updateIn(['safes', safeAddress], (prevSafe: any) => prevSafe.set(key, list))
     },
     [SET_DEFAULT_SAFE]: (state: SafeReducerMap, action) => state.set('defaultSafe', action.payload),
     [SET_LATEST_MASTER_CONTRACT_VERSION]: (state: SafeReducerMap, action) =>

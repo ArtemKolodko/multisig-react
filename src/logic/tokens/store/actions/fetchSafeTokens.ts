@@ -38,90 +38,88 @@ interface ExtractedData {
   tokens: List<Token>
 }
 
-const extractDataFromResult = (currentTokens: TokenState) => (
-  acc: ExtractedData,
-  { balance, fiatBalance, fiatCode, token, tokenAddress }: BalanceEndpoint,
-): ExtractedData => {
-  if (tokenAddress === null) {
-    acc.ethBalance = humanReadableValue(balance, 18)
-  } else {
-    acc.balances = acc.balances.merge({ [tokenAddress]: humanReadableValue(balance, Number(token?.decimals)) })
+const extractDataFromResult =
+  (currentTokens: TokenState) =>
+  (acc: ExtractedData, { balance, fiatBalance, fiatCode, token, tokenAddress }: BalanceEndpoint): ExtractedData => {
+    if (tokenAddress === null) {
+      acc.ethBalance = humanReadableValue(balance, 18)
+    } else {
+      acc.balances = acc.balances.merge({ [tokenAddress]: humanReadableValue(balance, Number(token?.decimals)) })
 
-    if (currentTokens && !currentTokens.get(tokenAddress)) {
-      acc.tokens = acc.tokens.push(makeToken({ address: tokenAddress, ...token }))
-    }
-  }
-
-  acc.currencyList = acc.currencyList.push(
-    makeBalanceCurrency({
-      currencyName: fiatCode,
-      tokenAddress,
-      balanceInBaseCurrency: fiatBalance,
-      balanceInSelectedCurrency: fiatBalance,
-    }),
-  )
-
-  return acc
-}
-
-const fetchSafeTokens = (safeAddress: string) => async (
-  dispatch: Dispatch,
-  getState: () => AppReduxState,
-): Promise<void> => {
-  try {
-    const state = getState()
-    const safe = safeSelector(state)
-    const currentTokens = tokensSelector(state)
-
-    if (!safe) {
-      return
+      if (currentTokens && !currentTokens.get(tokenAddress)) {
+        acc.tokens = acc.tokens.push(makeToken({ address: tokenAddress, ...token }))
+      }
     }
 
-    const tokenCurrenciesBalances = await backOff(() => fetchTokenCurrenciesBalances(safeAddress))
-    const currentEthBalance = safeEthBalanceSelector(state)
-    const safeBalances = safeBalancesSelector(state)
-    const alreadyActiveTokens = safeActiveTokensSelector(state)
-    const blacklistedTokens = safeBlacklistedTokensSelector(state)
-    const currencyValues = currencyValuesSelector(state)
-
-    const { balances, currencyList, ethBalance, tokens } = tokenCurrenciesBalances.reduce<ExtractedData>(
-      extractDataFromResult(currentTokens),
-      {
-        balances: Map(),
-        currencyList: List(),
-        ethBalance: '0',
-        tokens: List(),
-      },
+    acc.currencyList = acc.currencyList.push(
+      makeBalanceCurrency({
+        currencyName: fiatCode,
+        tokenAddress,
+        balanceInBaseCurrency: fiatBalance,
+        balanceInSelectedCurrency: fiatBalance,
+      }),
     )
 
-    // need to persist those already active tokens, despite its balances
-    const activeTokens = alreadyActiveTokens.union(
-      // active tokens by balance, excluding those already blacklisted and the `null` address
-      balances.keySeq().toSet().subtract(blacklistedTokens),
-    )
-
-    const update = updateSafeValue(safeAddress)
-    const updateActiveTokens = activeTokens.equals(alreadyActiveTokens) ? noFunc : update({ activeTokens })
-    const updateBalances = balances.equals(safeBalances) ? noFunc : update({ balances })
-    const updateEthBalance = ethBalance === currentEthBalance ? noFunc : update({ ethBalance })
-    const storedCurrencyBalances = currencyValues?.get(safeAddress)?.get('currencyBalances')
-
-    const updateCurrencies = currencyList.equals(storedCurrencyBalances)
-      ? noFunc
-      : setCurrencyBalances(safeAddress, currencyList)
-
-    const updateTokens = tokens.size === 0 ? noFunc : addTokens(tokens)
-
-    batch(() => {
-      dispatch(updateActiveTokens)
-      dispatch(updateBalances)
-      dispatch(updateEthBalance)
-      dispatch(updateCurrencies)
-      dispatch(updateTokens)
-    })
-  } catch (err) {
-    console.error('Error fetching active token list', err)
+    return acc
   }
-}
+
+const fetchSafeTokens =
+  (safeAddress: string) =>
+  async (dispatch: Dispatch, getState: () => AppReduxState): Promise<void> => {
+    try {
+      const state = getState()
+      const safe = safeSelector(state)
+      const currentTokens = tokensSelector(state)
+
+      if (!safe) {
+        return
+      }
+
+      const tokenCurrenciesBalances = await backOff(() => fetchTokenCurrenciesBalances(safeAddress))
+      const currentEthBalance = safeEthBalanceSelector(state)
+      const safeBalances = safeBalancesSelector(state)
+      const alreadyActiveTokens = safeActiveTokensSelector(state)
+      const blacklistedTokens = safeBlacklistedTokensSelector(state)
+      const currencyValues = currencyValuesSelector(state)
+
+      const { balances, currencyList, ethBalance, tokens } = tokenCurrenciesBalances.reduce<ExtractedData>(
+        extractDataFromResult(currentTokens),
+        {
+          balances: Map(),
+          currencyList: List(),
+          ethBalance: '0',
+          tokens: List(),
+        },
+      )
+
+      // need to persist those already active tokens, despite its balances
+      const activeTokens = alreadyActiveTokens.union(
+        // active tokens by balance, excluding those already blacklisted and the `null` address
+        balances.keySeq().toSet().subtract(blacklistedTokens),
+      )
+
+      const update = updateSafeValue(safeAddress)
+      const updateActiveTokens = activeTokens.equals(alreadyActiveTokens) ? noFunc : update({ activeTokens })
+      const updateBalances = balances.equals(safeBalances) ? noFunc : update({ balances })
+      const updateEthBalance = ethBalance === currentEthBalance ? noFunc : update({ ethBalance })
+      const storedCurrencyBalances = currencyValues?.get(safeAddress)?.get('currencyBalances')
+
+      const updateCurrencies = currencyList.equals(storedCurrencyBalances)
+        ? noFunc
+        : setCurrencyBalances(safeAddress, currencyList)
+
+      const updateTokens = tokens.size === 0 ? noFunc : addTokens(tokens)
+
+      batch(() => {
+        dispatch(updateActiveTokens)
+        dispatch(updateBalances)
+        dispatch(updateEthBalance)
+        dispatch(updateCurrencies)
+        dispatch(updateTokens)
+      })
+    } catch (err) {
+      console.error('Error fetching active token list', err)
+    }
+  }
 
 export default fetchSafeTokens

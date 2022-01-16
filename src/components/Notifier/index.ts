@@ -18,7 +18,7 @@ class Notifier extends Component<any> {
     }
     let notExists = false
     for (let i = 0; i < newSnacks.size; i += 1) {
-      const newSnack = newSnacks.get(i)
+      const newSnack: any = newSnacks.get(i)
 
       if (newSnack.dismissed) {
         closeSnackbar(newSnack.key)

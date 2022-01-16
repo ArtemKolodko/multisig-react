@@ -7,19 +7,8 @@ const cx = classNames.bind(styles)
 
 class Paragraph extends React.PureComponent<any> {
   render() {
-    const {
-      align,
-      children,
-      className,
-      color,
-      dot,
-      noMargin,
-      size,
-      transform,
-      weight,
-      inverseColors,
-      ...props
-    } = this.props
+    const { align, children, className, color, dot, noMargin, size, transform, weight, inverseColors, ...props } =
+      this.props
 
     return (
       <p

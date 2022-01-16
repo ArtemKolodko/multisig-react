@@ -2,7 +2,7 @@
 
 export enum WALLETS {
   METAMASK = 'metamask',
-  ONEWALLET = 'onewallet'
+  ONEWALLET = 'onewallet',
 }
 
 export enum FEATURES {

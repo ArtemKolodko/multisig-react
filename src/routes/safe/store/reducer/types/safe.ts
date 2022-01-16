@@ -12,6 +12,7 @@ export interface SafeReducerState {
 }
 
 interface SafeReducerStateJSON {
+  [key: string]: any
   defaultSafe: 'NOT_ASKED' | string | undefined
   safes: Record<string, SafeRecordProps>
   latestMasterContractVersion: string

@@ -18,7 +18,7 @@ const isStateSubset = (superObj, subObj) => {
 
 export const shouldSafeStoreBeUpdated = (
   newSafeProps: Partial<SafeRecordProps>,
-  oldSafeProps?: SafeRecordProps,
+  oldSafeProps?: SafeRecordProps | unknown,
 ): boolean => {
   if (!oldSafeProps) return true
 

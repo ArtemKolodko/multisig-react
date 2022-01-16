@@ -16,14 +16,11 @@ export const providerNameSelector = createSelector(providerSelector, (provider: 
   return name ? name.toLowerCase() : undefined
 })
 
-export const networkSelector = createSelector(
-  providerSelector,
-  (provider: ProviderState): HARMONY_NETWORK => {
-    const networkId = provider.get('network')
+export const networkSelector = createSelector(providerSelector, (provider: ProviderState): HARMONY_NETWORK => {
+  const networkId = provider.get('network')
 
-    return networkId ?? HARMONY_NETWORK.UNKNOWN
-  },
-)
+  return networkId ?? HARMONY_NETWORK.UNKNOWN
+})
 
 export const loadedSelector = createSelector(providerSelector, (provider: ProviderState): boolean =>
   provider.get('loaded'),

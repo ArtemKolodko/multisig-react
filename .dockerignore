@@ -1,0 +1,9 @@
+!.eslintrc.js
+.git
+node_modules
+build
+migrations
+patches
+test
+*.spec*
+*.test*

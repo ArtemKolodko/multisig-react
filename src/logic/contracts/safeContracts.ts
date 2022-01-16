@@ -1,6 +1,6 @@
 import { AbiItem } from 'web3-utils'
-import GnosisSafeSol from '@gnosis.pm/safe-contracts/build/contracts/GnosisSafe.json'
-import ProxyFactorySol from '@gnosis.pm/safe-contracts/build/contracts/GnosisSafeProxyFactory.json'
+import GnosisSafeSol from '@gnosis.pm/safe-contracts/build/artifacts/contracts/GnosisSafe.sol/GnosisSafe.json'
+import ProxyFactorySol from '@gnosis.pm/safe-contracts/build/artifacts/contracts/proxies/GnosisSafeProxyFactory.sol/GnosisSafeProxyFactory.json'
 import Web3 from 'web3'
 
 import { HARMONY_NETWORK } from 'src/config/networks/network.d'
@@ -34,7 +34,7 @@ export const getGnosisSafeContract = (web3: Web3, networkId: HARMONY_NETWORK) =>
   //  but up until v1.2.0 the address is the same for all the networks.
   //  So, if we can't find the network in the Contract artifact, we fallback to MAINNET.
   const contractAddress = '0x3736aC8400751bf07c6A2E4db3F4f3D9D422abB2'
-  return (new web3.eth.Contract(GnosisSafeSol.abi as AbiItem[], contractAddress) as unknown) as GnosisSafe
+  return new web3.eth.Contract(GnosisSafeSol.abi as AbiItem[], contractAddress) as unknown as GnosisSafe
 }
 
 /**
@@ -47,7 +47,7 @@ const getProxyFactoryContract = (web3: Web3, networkId: HARMONY_NETWORK): Gnosis
   //  but up until v1.2.0 the address is the same for all the networks.
   //  So, if we can't find the network in the Contract artifact, we fallback to MAINNET.
   const contractAddress = '0x4f9b1dEf3a0f6747bF8C870a27D3DeCdf029100e'
-  return (new web3.eth.Contract(ProxyFactorySol.abi as AbiItem[], contractAddress) as unknown) as GnosisSafeProxyFactory
+  return new web3.eth.Contract(ProxyFactorySol.abi as AbiItem[], contractAddress) as unknown as GnosisSafeProxyFactory
 }
 
 /**
@@ -55,10 +55,10 @@ const getProxyFactoryContract = (web3: Web3, networkId: HARMONY_NETWORK): Gnosis
  */
 export const getSpendingLimitContract = () => {
   const web3 = getWeb3()
-  return (new web3.eth.Contract(
+  return new web3.eth.Contract(
     SpendingLimitModule.abi as AbiItem[],
     SPENDING_LIMIT_MODULE_ADDRESS,
-  ) as unknown) as AllowanceModule
+  ) as unknown as AllowanceModule
 }
 
 export const getMasterCopyAddressFromProxyAddress = async (proxyAddress: string): Promise<string | undefined> => {
@@ -140,5 +140,5 @@ export const estimateGasForDeployingSafe = async (
 
 export const getGnosisSafeInstanceAt = (safeAddress: string): GnosisSafe => {
   const web3 = getWeb3()
-  return (new web3.eth.Contract(GnosisSafeSol.abi as AbiItem[], safeAddress) as unknown) as GnosisSafe
+  return new web3.eth.Contract(GnosisSafeSol.abi as AbiItem[], safeAddress) as unknown as GnosisSafe
 }
